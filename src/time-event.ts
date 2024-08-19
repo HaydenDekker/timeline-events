@@ -29,6 +29,9 @@ export class TimeEvent extends LitElement {
 
   option: EChartsOption = {};
 
+  @property({type:Array})
+  markers = []
+
   updated(){
 
     var chartDom = this.renderRoot.querySelector("#main");
@@ -40,6 +43,27 @@ export class TimeEvent extends LitElement {
         data: arr,
         type: 'scatter'
       };
+    });
+
+    var marklinot = this.markers.map(arr=>{
+      return {
+        name: arr[0],
+        yAxis: arr[1],
+        label: {
+          formatter: arr[0]
+        }
+      }
+
+    });
+
+    seriesMap.push({
+      type: 'line',
+      data:[],
+      markLine: {
+        data: marklinot,
+        silent: true,
+      }
+
     });
 
     this.option = {
