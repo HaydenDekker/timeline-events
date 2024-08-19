@@ -24,13 +24,16 @@ export class TimeEvent extends LitElement {
   @property({ type: Number })
   count = 0
 
-  @property({type:Array})
+  @property({type: Array})
   data = []
 
   option: EChartsOption = {};
 
-  @property({type:Array})
+  @property({type: Array})
   markers = []
+
+  @property({type: Array})
+  vert_markers = [];
 
   updated(){
 
@@ -66,6 +69,26 @@ export class TimeEvent extends LitElement {
 
     });
 
+    var vert_markerst = this.vert_markers.map(arr=>{
+      return {
+        name: arr[0],
+        xAxis: arr[1],
+        label: {
+          formatter: arr[0]
+        }
+      }
+
+    });
+
+    seriesMap.push({
+      type: 'line',
+      data:[],
+      markLine: {
+        data: vert_markerst,
+        silent: true,
+      }
+    });
+
     this.option = {
       tooltip: {
         trigger: 'axis'
@@ -82,6 +105,9 @@ export class TimeEvent extends LitElement {
             type: 'slider',
             yAxisIndex: [0],
             filterMode: 'empty'
+        },
+        {
+          type: 'inside'
         }
     ],
       xAxis: {
