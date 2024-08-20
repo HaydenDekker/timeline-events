@@ -1,6 +1,7 @@
 import { LitElement, css, html } from 'lit'
 import { customElement, property } from 'lit/decorators.js'
 import * as echarts from 'echarts';
+import { CallbackDataParams, TopLevelFormatterParams } from 'echarts/types/dist/shared';
 
 type EChartsOption = echarts.EChartsOption;
 
@@ -34,6 +35,22 @@ export class TimeEvent extends LitElement {
 
   @property({type: Array})
   vert_markers = [];
+
+  constructor(){
+    super();
+    this._dispatch_ChartClick = this._dispatch_ChartClick.bind(this);
+  }
+
+  _dispatch_ChartClick(timeStamp: String){
+    const event = new CustomEvent('timeline', {
+      detail: {
+        message: 'Something important happened',
+        timeline: timeStamp
+      }
+    });
+    this.dispatchEvent(event);
+
+  }
 
   updated(){
 
@@ -91,7 +108,16 @@ export class TimeEvent extends LitElement {
 
     this.option = {
       tooltip: {
-        trigger: 'axis'
+        trigger: 'axis',
+        formatter: function (params: TopLevelFormatterParams, ticket) {
+         let p = params as CallbackDataParams[];
+         
+        return p.map(series=>{
+            let d = series.data as Array<any>;
+            return d[2];
+          })
+          .reduce((p, n) => p + ' ' + n);
+        }
       },
       dataZoom: [
         {
@@ -121,6 +147,15 @@ export class TimeEvent extends LitElement {
 
 
     this.option && myChart.setOption(this.option);
+
+    let evtD = this._dispatch_ChartClick;
+
+    myChart.on('click', 'series', function(params: echarts.ECElementEvent){
+      let ar = params.data as Array<any>;
+      evtD(ar[0]);
+    });
+
+
   }
 
   render() {
